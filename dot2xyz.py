@@ -45,8 +45,8 @@ def addHydrogens(geom, dot_graph):
     """Fill the valency of sp2 carbon atoms"""
     "For each node, build the list of connected nodes"
     for node in dot_graph.get_nodes():
+        connected = []
         for edge in dot_graph.get_edges():
-            connected = []
             if (edge.get_source() == node.get_name()):
                 connected.append(edge.get_destination())
             elif (edge.get_destination() == node.get_name()):
@@ -56,7 +56,7 @@ def addHydrogens(geom, dot_graph):
     i = 0
     for node in dot_graph.get_nodes():
         connected = geom[node.get_name()]["connected"]
-        if (len(connected) < 2) or (len(connected > 3)):
+        if (len(connected) < 2) or (len(connected) > 3):
             logging.error("Error center {} is connected {} times".format(node.get_name(), len(connected)))
             exit(99)
         elif (len(connected)) == 2:
@@ -73,11 +73,11 @@ def addHydrogens(geom, dot_graph):
             "AC = C-A"
             "AB+AC = B+C-2A"
             vect = - (B + C - 2 * A)
-            "we normalize and adjsut the CH distance to a reasonable value"
-            vect = 1.1 * vect / norm(vect)
+            "we normalize and adjust the CH distance to a reasonable value"
+            vect = 1.1 * vect / numpy.linalg.norm(vect)
             "we add the hydrogen"
             i = i + 1
-            geom["H" + i] = {'pos': vect}
+            geom["H" + str(i)] = {'pos': A + vect, 'type': "H"}
 
 
 def main():
@@ -94,9 +94,10 @@ def main():
     scale(geom)
     addHydrogens(geom, dot_graph)
 
-    print(len(geom), '\n')
+    print(len(geom), '\n', file=open("geom.xyz", "w"))
     for at in geom.keys():
-        print("{0} {1[0]:16.8f} {1[1]:16.8f} {1[2]:16.8f} ".format(geom[at]["type"], geom[at]["pos"]))
+        print("{0} {1[0]:16.8f} {1[1]:16.8f} {1[2]:16.8f} ".format(geom[at]["type"], geom[at]["pos"]),
+              file=open("geom.xyz", "a"))
 
 
 if __name__ == '__main__':
