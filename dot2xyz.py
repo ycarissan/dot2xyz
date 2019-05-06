@@ -1,8 +1,6 @@
-import os
 import logging
 import argparse
 import pydot
-import math
 import numpy
 
 logging.basicConfig(filename='dot2xyz.log', level=logging.DEBUG)
